@@ -91,3 +91,44 @@ def most_successful(df, sport):
 
 
 
+def yearwise_medal_tally(df,country):
+    temp_df=df.dropna(subset=['Medal'])
+    temp_df.drop_duplicates(subset=['Team', 'NOC', 'Games', 'Year', 'City', 'Sport', 'Event', 'Medal'], inplace=True)
+    new_df = temp_df[temp_df['region'] == country]
+    final_df = new_df.groupby('Year').count()['Medal'].reset_index()
+    return final_df
+
+def country_event_heatmap(df,country):
+    temp_df = df.dropna(subset=['Medal'])
+    temp_df.drop_duplicates(subset=['Team', 'NOC', 'Games', 'Year', 'City', 'Sport', 'Event', 'Medal'], inplace=True)
+    new_df = temp_df[temp_df['region'] == country]
+    pivot = new_df.pivot_table(
+        index='Sport',
+        columns='Year',
+        values='Medal',
+        aggfunc='count'
+    ).fillna(0)
+    return pivot
+
+
+def most_successful_country_wise(df, country):
+    temp_df = df.dropna(subset=['Medal'])
+
+    temp_df = temp_df[temp_df['region'] == country]
+
+    # Count medals per athlete
+    top_athletes = temp_df['Name'].value_counts().reset_index().head(15)
+    top_athletes.columns = ['Athlete', 'Medal_Count']
+
+    # Merge to get Sport and region info
+    top_athletes = top_athletes.merge(
+        df[['Name', 'Sport', 'region']].drop_duplicates(subset=['Name']),
+        left_on='Athlete',
+        right_on='Name',
+        how='left'
+    )
+
+    # Select relevant columns
+    top_athletes = top_athletes[['Athlete', 'Medal_Count', 'Sport']]
+
+    return top_athletes
