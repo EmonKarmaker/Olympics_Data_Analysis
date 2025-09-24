@@ -66,5 +66,28 @@ def data_over_time(df, col_name):
     return df_over_time
 
 
+def most_successful(df, sport):
+    temp_df = df.dropna(subset=['Medal'])
+
+    if sport != 'Overall':
+        temp_df = temp_df[temp_df['Sport'] == sport]
+
+    # Count medals per athlete
+    top_athletes = temp_df['Name'].value_counts().reset_index().head(15)
+    top_athletes.columns = ['Athlete', 'Medal_Count']
+
+    # Merge to get Sport and region info
+    top_athletes = top_athletes.merge(
+        df[['Name', 'Sport', 'region']].drop_duplicates(subset=['Name']),
+        left_on='Athlete',
+        right_on='Name',
+        how='left'
+    )
+
+    # Select relevant columns
+    top_athletes = top_athletes[['Athlete', 'Medal_Count', 'Sport', 'region']]
+
+    return top_athletes
+
 
 
