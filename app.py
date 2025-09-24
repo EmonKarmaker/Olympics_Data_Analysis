@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 
 import preprocessor, helper
 df=pd.read_csv('athlete_events.csv')
@@ -39,9 +40,9 @@ if user_menu == 'Overall Analysis':
     events = df['Event'].nunique()
     athletes = df['Name'].nunique()
     nations = df['region'].nunique()
-
+    st.title("top statistics")
     # Create 3 columns
-    col1, col2, col3, col4,col5, col6 = st.columns(6)
+    col1, col2, col3,  = st.columns(3)
     with col1:
         st.header("Editions ")
         st.title(editions)
@@ -51,13 +52,49 @@ if user_menu == 'Overall Analysis':
     with col3:
         st.header("Sports ")
         st.title(sports)
-    with col4:
+
+    col1, col2, col3, = st.columns(3)
+    with col1:
         st.header("Events ")
         st.title(events)
-    with col5:
+    with col2:
         st.header("Athlets ")
         st.title(athletes)
-    with col6:
+    with col3:
         st.header("nations ")
         st.title(nations)
+
+    nations_over_time=helper.data_over_time(df,'region')
+
+    fig = px.line(
+        data_frame=nations_over_time,
+        x='Edition',
+        y='No of region',  # correct column name
+        title='Participating Nations Over Time'
+    )
+
+    st.plotly_chart(fig)
+
+    events_over_time = helper.data_over_time(df, 'Event')
+
+    fig = px.line(
+        data_frame=events_over_time,
+        x='Edition',
+        y='No of Event',
+        title='Events Over Time'
+    )
+
+    st.plotly_chart(fig)
+
+    athletes_over_time = helper.data_over_time(df, 'Name')
+
+    fig = px.line(
+        data_frame=athletes_over_time,
+        x='Edition',
+        y='No of Name',  # use the actual column name
+        title='Athletes Over Time'
+    )
+
+    st.plotly_chart(fig)
+
 

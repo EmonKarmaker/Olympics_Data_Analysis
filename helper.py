@@ -1,5 +1,5 @@
 import numpy as np
-
+import plotly.express as px
 
 def fetch_medal_tally(df, year, country):
     medal_df = df.drop_duplicates(subset=['Team', 'NOC', 'Games', 'Year', 'City', 'Sport', 'Event', 'Medal'])
@@ -53,3 +53,18 @@ def country_year_list(df):
     country.insert(0,'Overall')
 
     return years,country
+def data_over_time(df, col_name):
+    df_over_time = (
+        df.drop_duplicates(['Year', col_name])
+          .groupby('Year')
+          .size()
+          .reset_index(name='No of ' + col_name)
+    )
+    # Rename 'Year' to 'Edition' after reset_index
+    df_over_time.rename(columns={'Year': 'Edition'}, inplace=True)
+    df_over_time.sort_values(by='Edition', inplace=True)
+    return df_over_time
+
+
+
+
